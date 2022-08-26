@@ -29,8 +29,18 @@ struct Author {
 
   var lastName: String = String()
 
-  var birthDate: Int64 = 0
+  var birthDate: Int64 {
+    get {return _birthDate ?? 0}
+    set {_birthDate = newValue}
+  }
+  /// Returns true if `birthDate` has been explicitly set.
+  var hasBirthDate: Bool {return self._birthDate != nil}
+  /// Clears the value of `birthDate`. Subsequent reads from it will return its default value.
+  mutating func clearBirthDate() {self._birthDate = nil}
 
+  var psuedonyms: [String] = []
+
+  /// Can't do optional repeated properties
   var books: [Book] = []
 
   var awards: [Award] = []
@@ -38,6 +48,8 @@ struct Author {
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
+
+  fileprivate var _birthDate: Int64? = nil
 }
 
 #if swift(>=5.5) && canImport(_Concurrency)
@@ -52,8 +64,9 @@ extension Author: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBas
     1: .same(proto: "firstName"),
     2: .same(proto: "lastName"),
     3: .same(proto: "birthDate"),
-    4: .same(proto: "books"),
-    5: .same(proto: "awards"),
+    4: .same(proto: "psuedonyms"),
+    5: .same(proto: "books"),
+    6: .same(proto: "awards"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -64,29 +77,37 @@ extension Author: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBas
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.firstName) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.lastName) }()
-      case 3: try { try decoder.decodeSingularInt64Field(value: &self.birthDate) }()
-      case 4: try { try decoder.decodeRepeatedMessageField(value: &self.books) }()
-      case 5: try { try decoder.decodeRepeatedMessageField(value: &self.awards) }()
+      case 3: try { try decoder.decodeSingularInt64Field(value: &self._birthDate) }()
+      case 4: try { try decoder.decodeRepeatedStringField(value: &self.psuedonyms) }()
+      case 5: try { try decoder.decodeRepeatedMessageField(value: &self.books) }()
+      case 6: try { try decoder.decodeRepeatedMessageField(value: &self.awards) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.firstName.isEmpty {
       try visitor.visitSingularStringField(value: self.firstName, fieldNumber: 1)
     }
     if !self.lastName.isEmpty {
       try visitor.visitSingularStringField(value: self.lastName, fieldNumber: 2)
     }
-    if self.birthDate != 0 {
-      try visitor.visitSingularInt64Field(value: self.birthDate, fieldNumber: 3)
+    try { if let v = self._birthDate {
+      try visitor.visitSingularInt64Field(value: v, fieldNumber: 3)
+    } }()
+    if !self.psuedonyms.isEmpty {
+      try visitor.visitRepeatedStringField(value: self.psuedonyms, fieldNumber: 4)
     }
     if !self.books.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.books, fieldNumber: 4)
+      try visitor.visitRepeatedMessageField(value: self.books, fieldNumber: 5)
     }
     if !self.awards.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.awards, fieldNumber: 5)
+      try visitor.visitRepeatedMessageField(value: self.awards, fieldNumber: 6)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -94,7 +115,8 @@ extension Author: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBas
   static func ==(lhs: Author, rhs: Author) -> Bool {
     if lhs.firstName != rhs.firstName {return false}
     if lhs.lastName != rhs.lastName {return false}
-    if lhs.birthDate != rhs.birthDate {return false}
+    if lhs._birthDate != rhs._birthDate {return false}
+    if lhs.psuedonyms != rhs.psuedonyms {return false}
     if lhs.books != rhs.books {return false}
     if lhs.awards != rhs.awards {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}

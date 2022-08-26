@@ -15,5 +15,7 @@ final class prototestTests: XCTestCase {
         author.lastName = "Orwell"
         author.books.append(book)
         XCTAssertEqual(author.books.count, 1)
+        let str = try author.jsonString()
+        XCTAssertNotNil(str)
     }
 }

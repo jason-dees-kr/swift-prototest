@@ -6,7 +6,8 @@ import "Award.proto";
 message Author {
     string firstName = 1;
     string lastName = 2;
-    int64 birthDate = 3;
-    repeated Book books = 4;
-    repeated Award awards = 5;
+    optional int64 birthDate = 3;
+    repeated string psuedonyms = 4;
+    repeated Book books = 5; // Can't do optional repeated properties
+    repeated Award awards = 6;
 }
