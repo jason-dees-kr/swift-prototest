@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+import "Author.proto";
+
+message Book {
+    string title = 1;
+    repeated Author authors = 2;
+}

@@ -6,6 +6,8 @@ final class prototestTests: XCTestCase {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        XCTAssertEqual(prototest().text, "Hello, World!")
+        var book = Book()
+        book.title = "title"
+        XCTAssertEqual(book.title, "title")
     }
 }
