@@ -27,7 +27,9 @@ struct Book {
 
   var title: String = String()
 
-  var authors: [Author] = []
+  var publishDateTime: Int64 = 0
+
+  var awards: [Award] = []
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -44,7 +46,8 @@ extension Book: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase,
   static let protoMessageName: String = "Book"
   static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "title"),
-    2: .same(proto: "authors"),
+    2: .same(proto: "publishDateTime"),
+    3: .same(proto: "awards"),
   ]
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
@@ -54,7 +57,8 @@ extension Book: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase,
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.title) }()
-      case 2: try { try decoder.decodeRepeatedMessageField(value: &self.authors) }()
+      case 2: try { try decoder.decodeSingularInt64Field(value: &self.publishDateTime) }()
+      case 3: try { try decoder.decodeRepeatedMessageField(value: &self.awards) }()
       default: break
       }
     }
@@ -64,15 +68,19 @@ extension Book: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase,
     if !self.title.isEmpty {
       try visitor.visitSingularStringField(value: self.title, fieldNumber: 1)
     }
-    if !self.authors.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.authors, fieldNumber: 2)
+    if self.publishDateTime != 0 {
+      try visitor.visitSingularInt64Field(value: self.publishDateTime, fieldNumber: 2)
+    }
+    if !self.awards.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.awards, fieldNumber: 3)
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: Book, rhs: Book) -> Bool {
     if lhs.title != rhs.title {return false}
-    if lhs.authors != rhs.authors {return false}
+    if lhs.publishDateTime != rhs.publishDateTime {return false}
+    if lhs.awards != rhs.awards {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

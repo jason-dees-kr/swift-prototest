@@ -1,8 +1,9 @@
 syntax = "proto3";
 
-import "Author.proto";
+import "Award.proto";
 
 message Book {
     string title = 1;
-    repeated Author authors = 2;
+    int64 publishDateTime = 2;
+    repeated Award awards = 3;
 }

@@ -9,5 +9,11 @@ final class prototestTests: XCTestCase {
         var book = Book()
         book.title = "title"
         XCTAssertEqual(book.title, "title")
+        
+        var author = Author()
+        author.firstName = "George"
+        author.lastName = "Orwell"
+        author.books.append(book)
+        XCTAssertEqual(author.books.count, 1)
     }
 }

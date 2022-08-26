@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message Award {
+    string name = 1;
+    int64 dateTime = 2;
+}
