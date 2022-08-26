@@ -1,11 +1,11 @@
-syntax = "proto3";
+syntax = "proto2";
 
 import "Book.proto";
 import "Award.proto";
 
 message Author {
-    string firstName = 1;
-    string lastName = 2;
+    required string firstName = 1;
+    required string lastName = 2;
     optional int64 birthDate = 3;
     repeated string psuedonyms = 4;
     repeated Book books = 5; // Can't do optional repeated properties
