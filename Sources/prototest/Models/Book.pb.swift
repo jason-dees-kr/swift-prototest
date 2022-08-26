@@ -25,15 +25,32 @@ struct Book {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var title: String = String()
+  var title: String {
+    get {return _title ?? String()}
+    set {_title = newValue}
+  }
+  /// Returns true if `title` has been explicitly set.
+  var hasTitle: Bool {return self._title != nil}
+  /// Clears the value of `title`. Subsequent reads from it will return its default value.
+  mutating func clearTitle() {self._title = nil}
 
-  var publishDateTime: Int64 = 0
+  var publishDateTime: Int64 {
+    get {return _publishDateTime ?? 0}
+    set {_publishDateTime = newValue}
+  }
+  /// Returns true if `publishDateTime` has been explicitly set.
+  var hasPublishDateTime: Bool {return self._publishDateTime != nil}
+  /// Clears the value of `publishDateTime`. Subsequent reads from it will return its default value.
+  mutating func clearPublishDateTime() {self._publishDateTime = nil}
 
   var awards: [Award] = []
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
+
+  fileprivate var _title: String? = nil
+  fileprivate var _publishDateTime: Int64? = nil
 }
 
 #if swift(>=5.5) && canImport(_Concurrency)
@@ -50,14 +67,20 @@ extension Book: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase,
     3: .same(proto: "awards"),
   ]
 
+  public var isInitialized: Bool {
+    if self._title == nil {return false}
+    if !SwiftProtobuf.Internal.areAllInitialized(self.awards) {return false}
+    return true
+  }
+
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.title) }()
-      case 2: try { try decoder.decodeSingularInt64Field(value: &self.publishDateTime) }()
+      case 1: try { try decoder.decodeSingularStringField(value: &self._title) }()
+      case 2: try { try decoder.decodeSingularInt64Field(value: &self._publishDateTime) }()
       case 3: try { try decoder.decodeRepeatedMessageField(value: &self.awards) }()
       default: break
       }
@@ -65,12 +88,16 @@ extension Book: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase,
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    if !self.title.isEmpty {
-      try visitor.visitSingularStringField(value: self.title, fieldNumber: 1)
-    }
-    if self.publishDateTime != 0 {
-      try visitor.visitSingularInt64Field(value: self.publishDateTime, fieldNumber: 2)
-    }
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._title {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._publishDateTime {
+      try visitor.visitSingularInt64Field(value: v, fieldNumber: 2)
+    } }()
     if !self.awards.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.awards, fieldNumber: 3)
     }
@@ -78,8 +105,8 @@ extension Book: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase,
   }
 
   static func ==(lhs: Book, rhs: Book) -> Bool {
-    if lhs.title != rhs.title {return false}
-    if lhs.publishDateTime != rhs.publishDateTime {return false}
+    if lhs._title != rhs._title {return false}
+    if lhs._publishDateTime != rhs._publishDateTime {return false}
     if lhs.awards != rhs.awards {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true

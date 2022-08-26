@@ -25,9 +25,23 @@ struct Author {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var firstName: String = String()
+  var firstName: String {
+    get {return _firstName ?? String()}
+    set {_firstName = newValue}
+  }
+  /// Returns true if `firstName` has been explicitly set.
+  var hasFirstName: Bool {return self._firstName != nil}
+  /// Clears the value of `firstName`. Subsequent reads from it will return its default value.
+  mutating func clearFirstName() {self._firstName = nil}
 
-  var lastName: String = String()
+  var lastName: String {
+    get {return _lastName ?? String()}
+    set {_lastName = newValue}
+  }
+  /// Returns true if `lastName` has been explicitly set.
+  var hasLastName: Bool {return self._lastName != nil}
+  /// Clears the value of `lastName`. Subsequent reads from it will return its default value.
+  mutating func clearLastName() {self._lastName = nil}
 
   var birthDate: Int64 {
     get {return _birthDate ?? 0}
@@ -49,6 +63,8 @@ struct Author {
 
   init() {}
 
+  fileprivate var _firstName: String? = nil
+  fileprivate var _lastName: String? = nil
   fileprivate var _birthDate: Int64? = nil
 }
 
@@ -69,14 +85,22 @@ extension Author: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBas
     6: .same(proto: "awards"),
   ]
 
+  public var isInitialized: Bool {
+    if self._firstName == nil {return false}
+    if self._lastName == nil {return false}
+    if !SwiftProtobuf.Internal.areAllInitialized(self.books) {return false}
+    if !SwiftProtobuf.Internal.areAllInitialized(self.awards) {return false}
+    return true
+  }
+
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       // The use of inline closures is to circumvent an issue where the compiler
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.firstName) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self.lastName) }()
+      case 1: try { try decoder.decodeSingularStringField(value: &self._firstName) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self._lastName) }()
       case 3: try { try decoder.decodeSingularInt64Field(value: &self._birthDate) }()
       case 4: try { try decoder.decodeRepeatedStringField(value: &self.psuedonyms) }()
       case 5: try { try decoder.decodeRepeatedMessageField(value: &self.books) }()
@@ -91,12 +115,12 @@ extension Author: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBas
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
     // https://github.com/apple/swift-protobuf/issues/1182
-    if !self.firstName.isEmpty {
-      try visitor.visitSingularStringField(value: self.firstName, fieldNumber: 1)
-    }
-    if !self.lastName.isEmpty {
-      try visitor.visitSingularStringField(value: self.lastName, fieldNumber: 2)
-    }
+    try { if let v = self._firstName {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._lastName {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 2)
+    } }()
     try { if let v = self._birthDate {
       try visitor.visitSingularInt64Field(value: v, fieldNumber: 3)
     } }()
@@ -113,8 +137,8 @@ extension Author: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBas
   }
 
   static func ==(lhs: Author, rhs: Author) -> Bool {
-    if lhs.firstName != rhs.firstName {return false}
-    if lhs.lastName != rhs.lastName {return false}
+    if lhs._firstName != rhs._firstName {return false}
+    if lhs._lastName != rhs._lastName {return false}
     if lhs._birthDate != rhs._birthDate {return false}
     if lhs.psuedonyms != rhs.psuedonyms {return false}
     if lhs.books != rhs.books {return false}

@@ -12,10 +12,20 @@ final class prototestTests: XCTestCase {
         
         var author = Author()
         author.firstName = "George"
-        author.lastName = "Orwell"
         author.books.append(book)
         XCTAssertEqual(author.books.count, 1)
         let str = try author.jsonString()
         XCTAssertNotNil(str)
+    }
+    
+    func testStartFlow() {
+        var startFlow = StartFlow()
+        startFlow.appointmentType = "not real, sorry"
+        startFlow.schemaVersion = "1.2.3" //can write to 
+        startFlow.scenarioName = "stop-flow, actually"
+        
+        XCTAssertEqual(startFlow.scenarioName, "stop-flow, actually")
+        XCTAssertEqual(startFlow.phoneNumberExists, .verified)
+        // default values are set for fields that we don't neccessarly want to have default values for
     }
 }
